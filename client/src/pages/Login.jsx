@@ -102,13 +102,13 @@ const Login = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
               <div className="font-medium text-gray-700 dark:text-gray-300">User (Student):</div>
-              <div className="text-gray-600 dark:text-gray-400">Email: user@test.com</div>
-              <div className="text-gray-600 dark:text-gray-400">Password: 123456</div>
+              <div className="text-gray-600 dark:text-gray-400">Email: amankumar@gmail.com</div>
+              <div className="text-gray-600 dark:text-gray-400">Password: 123456789</div>
             </div>
             <div className="bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg">
               <div className="font-medium text-purple-700 dark:text-purple-300">Admin:</div>
-              <div className="text-gray-600 dark:text-gray-400">Email: admin@test.com</div>
-              <div className="text-gray-600 dark:text-gray-400">Password: 123456</div>
+              <div className="text-gray-600 dark:text-gray-400">Email: rohitpatel@gmail.com</div>
+              <div className="text-gray-600 dark:text-gray-400">Password: 123456789</div>
             </div>
           </div>
         </div>
