@@ -2,43 +2,41 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// Helper function: Token Generate karne ke liye
 const generateToken = (id) => {
+
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is missing in .env file");
+  }
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d', // Token 30 din tak valid rahega
+    expiresIn: '30d',
   });
 };
 
-// @desc    Register new user
-// @route   POST /api/auth/register
-// @access  Public
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body || {};
-    // console.log("BODY 👉", req.body);
-    // 1. Validation
+    const { name, email, password } = req.body;
+
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Please add all fields' });
     }
 
-    // 2. Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // 3. Hash Password (Encryption)
+    // Hash Password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 4. Create User
+    // Create User (Force role to 'user')
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      role: 'user'
     });
 
-    // 5. Send Response (Token ke saath)
     if (user) {
       res.status(201).json({
         _id: user.id,
@@ -47,26 +45,22 @@ const registerUser = async (req, res) => {
         role: user.role,
         token: generateToken(user._id),
       });
-    } else {
-      res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Register Error Details:", error);
+    if (error.message.includes("JWT_SECRET")) {
+      return res.status(500).json({ message: "Server Config Error: JWT_SECRET missing" });
+    }
+
+    res.status(500).json({ message: 'Server Error: Check terminal for details' });
   }
 };
 
-// @desc    Authenticate a user (Login)
-// @route   POST /api/auth/login
-// @access  Public
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-    // 1. Check for user email
-    const user = await User.findOne({ email }).select('+password'); // Explicitly select password
-
-    // 2. Check Password (Compare plain text with Hash)
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         _id: user.id,
@@ -84,16 +78,8 @@ const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Get User Data (Me)
-// @route   GET /api/auth/me
-// @access  Private
 const getMe = async (req, res) => {
-  // Ye function hum tab banayenge jab Middleware ready hoga
   res.status(200).json(req.user);
-}
-
-module.exports = {
-  registerUser,
-  loginUser,
-  getMe,
 };
+
+module.exports = { registerUser, loginUser, getMe };

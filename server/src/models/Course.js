@@ -4,51 +4,80 @@ const courseSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Please add a course title'],
-    trim: true,
-    maxlength: [100, 'Name can not be more than 100 characters']
+    trim: true
+  },
+  slug: {
+    type: String,
+    lowercase: true
   },
   description: {
     type: String,
     required: [true, 'Please add a description']
   },
-  price: {
-    type: Number,
-    required: [true, 'Please add a price'],
-    default: 0
-  },
-  thumbnail: {
-    type: String, // URL of the image
-    default: 'no-photo.jpg'
-  },
-  category: {
-    type: String,
-    required: [true, 'Please select a category'],
-    enum: ['web-dev', 'mobile-dev', 'data-science', 'design', 'marketing']
-  },
-  difficulty: {
-    type: String,
-    enum: ['beginner', 'intermediate', 'advanced'],
-    default: 'beginner'
-  },
   instructor: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User', // Refers to the User model
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
-  // Lectures Array inside Course
-  lectures: [
+  price: {
+    type: Number,
+    default: 0
+  },
+
+  category: {
+    type: String,
+    required: true
+  },
+  thumbnail: {
+    type: String,
+    default: 'https://via.placeholder.com/400'
+  },
+  rating: {
+    type: Number,
+    default: 0
+  },
+  studentsEnrolled: {
+    type: Number,
+    default: 0
+  },
+  level: {
+    type: String,
+    default: 'Beginner'
+  },
+  lessons: [
     {
-      title: String,
-      videoUrl: String, // We will store Cloudinary/S3 URL here
-      duration: Number, // in minutes
-      isFree: {
-        type: Boolean,
-        default: false
-      }
+      title: { type: String },
+      videoUrl: { type: String },
+      duration: { type: String }
     }
-  ]
-}, {
-  timestamps: true
-});
+  ],
+  reviews: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    rating: {
+      type: Number,
+      required: true
+    },
+    comment: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  numReviews: {
+    type: Number,
+    default: 0
+  }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Course', courseSchema);
